@@ -1,0 +1,21 @@
+<h1>Search by Seller</h1>
+<table class="table table-striped table-condensed table-hover">
+  <tr>
+    <th>
+      Seller
+    </th>
+    <th>
+      Number of Products
+    </th>
+  </tr>
+  <% @sellers.each do |seller| %>
+    <tr>
+      <td>
+        <%= link_to "#{seller.username}", seller_path(id: seller.id) %>
+      </td>
+      <td>
+        <%= seller.products.count %>
+      </td>
+    </tr>
+  <% end %>
+</table>
