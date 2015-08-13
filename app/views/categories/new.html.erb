@@ -1,0 +1,28 @@
+<div class="col-sm-6 col-sm-offset-1">
+  <h2>Add a New Costume Category</h2>
+  <div class="form row">
+    <%= form_for @category do |f| %>
+      <div class="form-inline col-sm-offset-1">
+        <%= f.label :name %>
+        <%= f.text_field :name, required: :true %>
+
+        <%= f.submit "Submit", id: session[:user_id], class: "btn btn-primary" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+
+<div class="row">
+  <h5 class="col-sm-offset-1">List of Categories:</h5>
+  <ul class="col-sm-offset-1 list-inline">
+    <% @categories.each do |cat| %>
+      <li class="list-group-item"><%= cat.name %></li>
+    <% end %>
+  </ul>
+</div>
+
+
+<div class="row col-sm-offset-1">
+  <%= link_to "Return to Product List", my_user_products_path(user_id: session[:user_id]), method: :get, class: "btn btn-default" %>
+</div>

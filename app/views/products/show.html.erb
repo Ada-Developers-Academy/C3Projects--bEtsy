@@ -1,0 +1,53 @@
+<div class="col-sm-8 col-sm-offset-2">
+  <h1><%= @product.name %> <small><%= number_to_currency(@product.price) %></small></h1>
+
+  <%= image_tag(@product.photo_url, alt: "Image of #{@product.name}", height: 200) %>
+  <%= @product.description %>
+
+  <p>Merchant: <%= @product.user.username %></p>
+  <p>
+    Categories: <% @product.categories.each do |cat| %>
+    <%= cat.name %>
+    <% end %>
+  </p>
+
+
+  <% if session[:user_id] %>
+    <p>Status: <%= @status %></p>
+  <% end %>
+
+  <%= link_to "Add to Cart", order_order_items_path(order_id: session[:order_id], product_id: @product.id), html_options = { method: :post, class: "btn btn-default" } %>
+
+  <% if session[:user_id] %>
+    <%= link_to "Edit Product", edit_user_product_path(user_id: session[:user_id], product_id: @product.id), method: :get, class: "btn btn-default" %>
+    <%= link_to "Delete Product", product_path(@product.id), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger" %>
+  <% end %>
+
+  <h3>REVIEWS<h3>
+  <h3>
+    <% @product_average.times do %>
+      <span class='glyphicon glyphicon-star'></span>
+    <% end %>
+    <% (5 - @product_average).times do %>
+      <span class='glyphicon glyphicon-star-empty'></span>
+    <% end %>
+  </h3>
+  <% @product.reviews.each do |review| %>
+    <h4>Rating:
+      <% (review.rating).times do %>
+        <span class='glyphicon glyphicon-star'></span>
+      <% end %>
+      <% (5 - review.rating).times do %>
+        <span class='glyphicon glyphicon-star-empty'></span>
+      <% end %>
+    </h4>
+
+    <p>
+      <%= review.description %>
+    </p>
+  <% end %>
+  <% if @product.user_id != session[:user_id] %>
+    <%= link_to "Write Review", new_product_review_path(@product), { method: :get, class: "btn btn-default" } %>
+  <% end %>
+
+</div>

@@ -1,0 +1,92 @@
+<% subtotal = 0 %>
+<h4>Order Placed: <%= @purchase_time.strftime("%b %e, %Y at %l:%M %p") %></h4>
+<h4>Order Status: <%= @order.status.capitalize %></h4>
+
+<table class="table">
+<% if @order.status == "paid" || @order.status == "completed" %>
+  <h3>Customer Information</h3>
+  <tr>
+    <th>Name</th>
+    <th>Email</th>
+    <th>Mailing Address</th>
+    <th>Credit Card</th>
+    <th>Expires</th>
+  </tr>
+  <tr>
+    <td><%= @order.name.upcase %></td>
+    <td><%= @order.email %></td>
+    <td><%= @order.address1 %></td>
+    <td>XXXX-XXXX-<%= @order.card_last_4 %></td>
+    <td><%= @order.card_exp.strftime("%m/%y") %></td>
+  </tr>
+  <% end %>
+</table>
+
+<table class="table">
+  <tr>
+    <th>Name</th>
+    <th>Price</th>
+    <th>Qty</th>
+    <th>Total</th>
+    <th><%= "Shipped?" if session[:user_id] %></th>
+  </tr>
+    <% @order_items.each do |item| %>
+    <tr>
+      <% product = Product.find(item.product_id) %>
+      <td> <%= link_to product.name, product_path(product) %> </td>
+      <td> <%= number_to_currency(product.price) %> </td>
+      <td>
+        <%= item.quantity %>
+      </td>
+      <td> <%= number_to_currency(product.price * item.quantity) %> </td>
+		    <% subtotal += (product.price * item.quantity) %>
+      <td><% if @order.status == "complete" %>
+          <%= "\u2718" %>
+          <% else %>
+            <%= "\u274F" %>
+          <% end %>
+      </td>
+    </tr>
+
+      <% end %>
+
+	<tr>
+		<td colspan="2"></td>
+		<td>Subtotal:</td>
+		<td>
+			<%= number_to_currency(subtotal) %>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2"></td>
+		<td>Tax:</td>
+		<td>
+			<% tax = subtotal * 0.095 %>
+			<%= number_to_currency(tax) %>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2"></td>
+		<td>Total:</td>
+		<td>
+			<%= number_to_currency(subtotal + tax) %>
+		</td>
+	</tr>
+</table>
+
+<% if session[:user_id] %>
+  <%= link_to "Back to Dashboard", user_path(session[:user_id]), class: "btn btn-default" %>
+  <!-- status changes to "cancelled", session order_id == nil, redirect_to root_path -->
+  <% unless @order.status == "complete" || @order.status == "cancelled"%>
+    <%= link_to "Cancel Order", order_path(@order), method: :delete, class: "btn btn-danger" %>
+  <% end %>
+
+  <% if @order.status == "paid" %>
+    <%= link_to "Order Shipped", shipped_order_path, method: :get, class: "btn btn-success" %>
+  <% end %>
+<% else %>
+  <!-- status stays the same, session order_id == nil, redirect_to root_path -->
+  <%= link_to "Go Home", logout_path, method: :delete, class: "btn btn-default" %>
+  <!-- status changes to "cancelled", session order_id == nil, redirect_to root_path -->
+  <%= link_to "Cancel Order", order_path(@order), method: :delete, class: "btn btn-danger" %>
+<% end %>
