@@ -1,5 +1,9 @@
-<h1>CHECKOUT</h1>
+<div class="page-header">
+  <h1>CHECKOUT</h1>
+</div>
 
-<%= render "display_order_items" %>
+<%= render "display_nonpending_order_items" %>
+
+<%= link_to "<< Back to cart", cart_path %>
 
 <%= render "buyer_info_form" %>

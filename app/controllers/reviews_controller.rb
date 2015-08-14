@@ -9,17 +9,18 @@ before_action :set_product, only: [:create, :new]
       if @review.save
         redirect_to product_path(@product)
       else
+        flash.now[:errors] = @review.errors
         render :new
       end
   end
 
   private
+  
+    def set_product
+      @product = Product.find(params[:id])
+    end
 
-  def set_product
-    @product = Product.find(params[:id])
-  end
-
-  def create_params
-    params[:review].permit(:rating, :description, :product_id)
-  end
+    def create_params
+      params[:review].permit(:rating, :description, :product_id)
+    end
 end

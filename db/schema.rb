@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150715222921) do
+ActiveRecord::Schema.define(version: 20150724121726) do
 
   create_table "categories", force: :cascade do |t|
     t.string   "name",       null: false
@@ -28,11 +28,12 @@ ActiveRecord::Schema.define(version: 20150715222921) do
   add_index "categories_products", ["product_id"], name: "index_categories_products_on_product_id"
 
   create_table "order_items", force: :cascade do |t|
-    t.integer  "product_id",       null: false
-    t.integer  "order_id",         null: false
-    t.integer  "quantity_ordered", null: false
-    t.datetime "created_at",       null: false
-    t.datetime "updated_at",       null: false
+    t.integer  "product_id",                           null: false
+    t.integer  "order_id",                             null: false
+    t.integer  "quantity_ordered",                     null: false
+    t.datetime "created_at",                           null: false
+    t.datetime "updated_at",                           null: false
+    t.string   "status",           default: "pending", null: false
   end
 
   create_table "orders", force: :cascade do |t|
@@ -40,21 +41,22 @@ ActiveRecord::Schema.define(version: 20150715222921) do
     t.string   "buyer_name"
     t.string   "buyer_email"
     t.text     "buyer_address"
-    t.integer  "buyer_card_short"
+    t.string   "buyer_card_short"
     t.datetime "buyer_card_expiration"
     t.datetime "created_at",                                null: false
     t.datetime "updated_at",                                null: false
   end
 
   create_table "products", force: :cascade do |t|
-    t.string   "name",                    null: false
-    t.integer  "price",                   null: false
-    t.integer  "seller_id",               null: false
-    t.integer  "stock",       default: 0, null: false
+    t.string   "name",                        null: false
+    t.integer  "price",                       null: false
+    t.integer  "seller_id",                   null: false
+    t.integer  "stock",       default: 0,     null: false
     t.text     "description"
     t.string   "photo_url"
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+    t.boolean  "retired",     default: false
   end
 
   create_table "products_categories", id: false, force: :cascade do |t|

@@ -1,26 +1,61 @@
-<h1><%= @product.name %></h1>
+<div class="page-header">
+  <h1><%= @product.name %>
+    <small>Average Rating:
+      <% if @average_rating == 0 %>
+        <%= "No Reviews" %>
+      <% else %>
+        <%= @average_rating %>
+      <% end %>
+    </small>
+  </h1>
+</div>
 
-<%= image_tag "#{@product.photo_url}" %>
+<h2 class="product-info">
+  <small class="spacing">Price: <%= display_dollars(@product.price) %></small>
+  <small>Sold by: <%= @product.seller.username %></small>
+</h2>
 
-<p><%= @product.description %></p>
+<!-- Image and Description information -->
+<div class="row">
+  <div class="col-lg-2">
+    <%= image_tag "#{@product.photo_url}", size: "200" %>
+  </div>
+  <div class="col-lg-9 col-lg-offset-1">
+    <div class="panel panel-default">
+      <div class="panel-heading">Product Description:</div>
+      <div class="panel-body">
+        <%= @product.description %>
+      </div>
+    </div>
+  </div>
+</div>
 
-<h4><%= display_dollars(@product.price) %></h4>
+ <!-- Button links -->
+ <!-- Logic for Seller. if seller: Show edit, hide review -->
+ <div class="product-buttons">
+  <%= link_to "Add to Cart", add_item_path(@product), method: :post, class: "btn btn-primary no-border-buttons" %>
+  <% if session[:seller_id] == @product.seller_id %>
+    <%= link_to "Edit this Product", edit_product_path(@product), class: "btn btn-info" %>
+    <%= link_to retire_product_text(@product), retire_product_path(@product), method: :patch, class: "btn btn-warning no-border-buttons" %>
+  <% else %>
+    <%= link_to "Add Review", new_review_path, class: "btn btn-info no-border-buttons" %>
+  <% end %>
+ </div>
 
-<%= link_to "Add to Cart", add_item_path(@product), method: :post %>
-
-<h3>Reviews</h3>
-
-<h4>Average Rating: <%= @average_rating %></h4>
-
-<%= link_to "Add Review", new_review_path %>
-
-<% @reviews.each do |review| %>
-  <ul>
-    <li><%= review.rating %></li>
-    <li><%= review.description %></li>
-  </ul>
-<% end %>
+<!-- Categories -->
+<div class="row">
+  <% if @product_categories.count >= 1 %>
+    <h3>Categories: </h3>
+    <% @product_categories.each do |category| %>
+      <%= link_to category.name, category_path(category), class: "btn btn-default col-md-4 category-buttons no-border-buttons" %>
+    <% end %>
+  <% end %>
+</div>
 
 
-
-<!-- Add stuff for categories?? -->
+<!-- Reviews -->
+<div class="row">
+  <% if @product.reviews.count >= 1 %>
+    <%= render "show_reviews", reviews: @reviews %>
+  <% end %>
+</div>
