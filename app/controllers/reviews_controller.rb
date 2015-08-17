@@ -5,6 +5,13 @@ class ReviewsController < ApplicationController
   def new
     @review = Review.new
     @product = Product.find(params[:product_id])
+    if @product.user == @user
+      flash[:errors] = "You cannot leave a review for your own product."
+
+      redirect_to @product
+    else
+      render :new
+    end
   end
 
   def create
@@ -16,8 +23,6 @@ class ReviewsController < ApplicationController
       render :new
     end
   end
-
-
 
   private
 

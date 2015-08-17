@@ -1,49 +1,68 @@
 class UsersController < ApplicationController
 
-  before_action :require_login, except: [:new, :create]
-  before_action :validate_user, only: [:show]
+  before_action :authenticate_user, except: [:new, :create]
+  before_action :save_login_state, only: [:new]
 
   def new
-    @user = User.new(user_params[:user])
+    @new_user = User.new(user_params[:user])
   end
 
-# trip login so user is logged in as soon as they create the account
+  # trip login so user is logged in as soon as they create the account
   def create
     @user = User.create(user_params[:user])
     if @user.save
-      redirect_to login_path
       flash[:success] = "Registration successful, take your shiny new username and password for a spin"
+
+      redirect_to login_path
     else
       flash.now[:errors] = "Registration invalid, please try again."
-      render new_user_path
+
+      redirect_to register_path
     end
   end
 
   def show
-    @user_id = params[:id]
-    @user = User.find(@user_id)
+    sales_quantity
+    @total_sales = total_sales_for_current_user
+    @recent_sales = @user.recent_sales
+
+    render :show
   end
 
+  def edit
+  end
+
+  def update
+    @user.update(user_params[:user])
+    @user.save
+
+    redirect_to user_path
+  end
 
   private
-
-  # this could be added to any other controllers that also require login
-  def require_login
-    unless session[:user_id]
-      redirect_to login_path
-    end
-  end
-
-  def validate_user
-    if @user.id == session[:user_id]
-      render :show
-    else
-    redirect_to user_path(session[:user_id])
-    flash.now[:errors] = "Access denied"
-    end
-  end
 
   def user_params
     params.permit(user: [:username, :email, :password, :password_confirmation])
   end
-end
+
+  # this calculates total sales for the current_user, which is set in the sessions[:user_id]
+  def total_sales_for_current_user
+    total_sales = 0
+    @user.order_items.each do |order_item|
+      if order_item.order.status != "cancelled"
+        total_sales += order_item.quantity * order_item.product.price
+      end
+    end
+    total_sales/100
+  end
+
+  def sales_quantity
+    @quantity_sold = 0
+    sales_array = @user.order_items
+    sales_array.each do |sale|
+      if sale.order.status != "cancelled"
+        @quantity_sold += sale.quantity
+      end
+    end
+  end
+end # end of class

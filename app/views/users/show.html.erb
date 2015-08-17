@@ -1,10 +1,42 @@
-<% if flash[:errors] %>
-  <div>
-    <p class = "alert alert-danger">
-    <%= flash[:errors] %> </p>
-  </div>
-<% end %>
+<h4 class = "label label-default">Sales to Date: $<%= @total_sales %></h4>
+<h4 class = "label label-default">Total Items Sold: <%= @quantity_sold %></h4>
+<br>
+<br>
 
-<p>
-   you are logged in <big><%= @user.username %></big>!  How neato!
-</p>
+<h4>Recent Orders:</h4>
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th>
+        Order
+      </th>
+      <th>
+        Product
+      </th>
+      <th>
+        Quantity Sold
+      </th>
+      <th>
+        Status
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @recent_sales.each do |sale| %>
+      <tr>
+        <td>
+          <%= link_to("#{sale.order_id}", user_order_path(@user.id, sale.order_id)) %>
+        </td>
+        <td>
+          <%= link_to("#{sale.product.name}", user_product_path(@user.id, sale.product.id)) %>
+        </td>
+        <td>
+          <span class="badge"><%= sale.quantity %></span>
+        </td>
+        <td>
+          <%= sale.order.status.capitalize %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
