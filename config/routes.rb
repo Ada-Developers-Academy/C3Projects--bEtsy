@@ -2,31 +2,38 @@ Rails.application.routes.draw do
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
-  # You can have the root of your site routed with "root"
+  # home page with top items
   root 'home#index'
 
-  resources :products do
-    resources :reviews
+  # products-- no new (done through the merchant page), no destroy (retire instead)
+  ## do we need all the reviews routes?
+
+  resources :products, except: [:new, :destroy] do
+    resources :reviews, only: [:new, :create]
   end
 
+  # add a category
+  resources :categories, only: [:new, :create]
+
+  # custom product paths - by merchant, category, and to retire a product
   patch 'products/retire/:id' => 'products#retire', as: "retire"
+  get "/categories/products/:category_name" => "categories#show", as: "category"
+  get "/merchant/:id/products", to: "products#merchant_products", as: "merchant_products"
 
-  resources :users, path: "merchants" do
+  # users/merchants path makes the url path display as merchants instead of users
+  resources :users, path: "merchants", only: [:new, :create, :show] do
     resources :products, only: [:new]
+    resources :orders, only: [:index]
   end
 
-  get "/categories/:category_name" => "categories#show", as: "category"
+  get '/merchants/:user_id/orders/:id' => 'orders#buyer', as: 'user_order'
 
-  resources :users do
-    member do
-      resources :products, only: [:new]
-    end
-  end
+  ## check to see if using all after more of the orders things are fleshed out
+  resources :orders, except: [:index, :edit, :destroy]
 
-  resources :orders
+  get "/cart" => "orders#show", as: "cart"
 
   # RoR paths
-  resources :carts, only: [:show]
   resources :order_items, only: [:create, :update, :destroy]
 
   # sessions paths
@@ -34,53 +41,13 @@ Rails.application.routes.draw do
   post   "/login", to: "sessions#create"
   delete "/logout", to: "sessions#destroy"
 
-  get "/merchant/:id/products", to: "products#merchant_products", as: "merchant_products"
-  # Example of regular route:
-  #   get 'products/:id' => 'catalog#view'
+  # checkout
+  get  '/checkout' => 'buyers#new'
+  post '/checkout' => 'buyers#create'
 
-  # Example of named route that can be invoked with purchase_url(id: product.id)
-  #   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase
+  get '/confirmation/:order_id' =>'buyers#confirmation', as: 'buyer_confirmation'
 
-  # Example resource route (maps HTTP verbs to controller actions automatically):
-  #   resources :products
+  # shipped
+  patch '/shipped/:id' => 'order_items#shipped', as: 'shipped'
 
-  # Example resource route with options:
-  #   resources :products do
-  #     member do
-  #       get 'short'
-  #       post 'toggle'
-  #     end
-  #
-  #     collection do
-  #       get 'sold'
-  #     end
-  #   end
-
-  # Example resource route with sub-resources:
-  #   resources :products do
-  #     resources :comments, :sales
-  #     resource :seller
-  #   end
-
-  # Example resource route with more complex sub-resources:
-  #   resources :products do
-  #     resources :comments
-  #     resources :sales do
-  #       get 'recent', on: :collection
-  #     end
-  #   end
-
-  # Example resource route with concerns:
-  #   concern :toggleable do
-  #     post 'toggle'
-  #   end
-  #   resources :posts, concerns: :toggleable
-  #   resources :photos, concerns: :toggleable
-
-  # Example resource route within a namespace:
-  #   namespace :admin do
-  #     # Directs /admin/products/* to Admin::ProductsController
-  #     # (app/controllers/admin/products_controller.rb)
-  #     resources :products
-  #   end
 end

@@ -1,18 +1,29 @@
-<h3>Sign In!</h3>
-<% if flash.now[:error] %>
-  <div>
-      <%= flash.now[:error] %>
+<div class="row no-jumbo form-header">
+  <div class = "col-md-4 col-md-offset-4">
+      <h1>Sign In!</h1>
+      <% if flash.now[:error] %>
+        <class="error"><%= flash.now[:error] %></class>
+      <% end %>
   </div>
-<% end %>
-<%= form_for(:session, url: login_path) do |f| %>
-<!-- in form_for :session, telling us below are in the params[:session] hash -->
-<!-- url for the POST url after they click submit -->
-  <%= f.label :email %>
-  <%= f.text_field :email %>
+</div>
+<br>
+<div class="row">
+  <div class = "col-md-4 col-md-offset-4">
+    <%= form_for(:session, url: login_path) do |f| %>
+    <!-- in form_for :session, telling us below are in the params[:session] hash -->
+    <!-- url for the POST url after they click submit -->
+      <div class="form-group">
+        <%= f.label :email, class:"required" %>
+        <%= f.text_field :email, class: "form-control" %>
+      </div>
 
-  <%= f.label :password %>
-  <%= f.password_field :password %>
-  <!-- f.password_field will only display dots -->
+      <div class="form-group">
+        <%= f.label :password, class:"required" %>
+        <%= f.password_field :password, class: "form-control" %>
+        <!-- f.password_field will only display dots -->
+      </div>
 
-  <%= f.submit "Sign In" %>
-<% end %>
+      <%= f.submit "Sign In", class: "btn btn-primary" %>
+    <% end %>
+  </div>
+</div>

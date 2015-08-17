@@ -1,32 +1,3 @@
-<%= form_for @product, html: {class: "form"}, url: product_path(@product.id) do |f| %>
+<div class="container">
   <h2><center>Edit Product</h2>
-  <div class="jumbotron">
-    <div class = "form-group">
-      <div class="row">
-        <div class="col-md-6">
-          <%= f.label :name %>
-          <%= f.text_field :name, class: "form-control" %>
-
-          <%= f.label :price %>
-          <%= f.number_field :price, class: "form-control" %>
-
-          <%= f.label :description %>
-          <%= f.text_area :desc, class: "form-control" %>
-        </div>
-
-        <div class="col-md-6">
-          <%= f.label :stock %>
-          <%= f.number_field :stock, class: "form-control" %>
-
-          <%= f.label :photo_url %>
-          <%= f.text_field :photo_url, class: "form-control" %>
-
-          <%= f.label :retired %>
-          <%= f.check_box :retired, class: "form-control" %>
-
-        </div>
-      </div>
-    </div>
-  </div>
-  <%= f.submit 'Save changes', class: "btn btn-default" %>
-<% end %>
+  <%= render partial: "form", locals: { form_type: "edit" } %>

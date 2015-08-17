@@ -1,37 +1,35 @@
 class ProductsController < ApplicationController
-  before_action :require_login, except: [:index, :show, :merchant_products]
+  before_action :require_login, only: [:new, :create, :edit, :update, :destroy, :retire]
+  before_action :find_product,  only: [:show, :edit, :update, :destroy, :retire]
+  before_action :merchant_exist?, only: [:merchant_products]
 
   def index
     @products = Product.active_product
   end
 
   def show
-    @product = Product.find(params[:id])
     @order_item = current_order.order_items.new
   end
 
   def new
-    @product = Product.new
+    user = User.find(params[:user_id])
+    @product = Product.new(user_id: user.id)
   end
 
   def create
-    @product = Product.new(user_params[:product])
-
+    @product = Product.new(product_params)
+    @user_id = session[:user_id]
     if @product.save
-      redirect_to product_path(@product.id)
+      redirect_to product_path(@product)
     else
-      render :new
+      render 'new'
     end
   end
 
-  def edit
-    @product = Product.find(params[:id])
-  end
+  def edit; end
 
   def update
-    @product = Product.find(params[:id])
-
-    @product.update(user_params[:product])
+    @product.update(product_params)
 
     if @product.save
       redirect_to user_path(@product.user_id)
@@ -40,15 +38,7 @@ class ProductsController < ApplicationController
     end
   end
 
-  def destroy
-    show
-    @product.destroy
-
-    redirect_to products_path
-  end
-
   def retire
-    @product = Product.find(params[:id])
     @product.retire_toggle!
     @product.save
     redirect_to user_path(@product.user_id)
@@ -56,12 +46,27 @@ class ProductsController < ApplicationController
 
   def merchant_products
     @merchant = @merchants.find(params[:id])
-    @products = @merchant.products
   end
 
   private
 
-  def user_params
-    params.permit(product: [:name, :price, :desc, :stock, :photo_url, :user_id, :retired])
-  end
+    def find_product
+      @product = Product.find(params[:id])
+    end
+
+    def product_params
+      params.require(:product).permit(
+        :name, :price, :desc, :stock, :photo_url,
+        :user_id, :retired, :category_ids => [],
+        :categories_attributes => [:id, :name])
+    end
+
+    def merchant_exist?
+      if User.where(id: params["id"]).any?
+        show
+      else
+        flash[:error] = "This merchant does not exist"
+        redirect_to root_path
+      end
+    end
 end
